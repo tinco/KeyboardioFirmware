@@ -165,6 +165,11 @@ void handle_mouse_movement( char x, char y)
 
 }
 
+
+Key get_key(byte layer, byte row, byte col) {                        
+    return keymaps[layer][row][col];
+}
+
 void send_key_events(byte layer)
 {
         //for every newly pressed button, figure out what logical key it is and send a key down event
@@ -181,7 +186,7 @@ void send_key_events(byte layer)
 
                 for (byte col = 0; col < COLS; col++) {
                         byte switchState = matrixState[row][col];
-                        Key mappedKey = keymaps[layer][row][col];
+                        Key mappedKey = get_key(layer,row,col);
                         if (mappedKey.flags & MOUSE_KEY ) {
                                 if (key_is_pressed(switchState)) {
                                         if (mappedKey.rawKey & MOUSE_UP) {
@@ -277,11 +282,12 @@ void scan_matrix()
                         // that we should be looking at a seconary Keymap halfway through the matrix scan
 
 
+                        Key thisKey = get_key(active_layer,row,col);
 
-                        if (! (keymaps[active_layer][row][col].flags ^ ( MOMENTARY | SWITCH_TO_LAYER))) { // this logic sucks. there is a better way TODO this
+                        if (! (thisKey.flags ^ ( MOMENTARY | SWITCH_TO_LAYER))) { // this logic sucks. there is a better way TODO this
 
                                 if (key_is_pressed(matrixState[row][col])) {
-                                        active_layer = keymaps[current_layer][row][col].rawKey;
+                                        active_layer =thisKey.rawKey;
                                 }
                         }
                 }
